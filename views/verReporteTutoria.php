@@ -67,18 +67,29 @@ $tutor = htmlspecialchars($reporte['nombreTutor'] ?? '', ENT_QUOTES, 'UTF-8');
                             </thead>
                             <tbody>
                                 <?php
+                                echo "<script>console.log('Problematicas:', " . json_encode($problematicasReporte) . ");</script>";
                                 foreach ($problematicasReporte as $index => $problematica) {
                                     echo "<tr>";
                                     $nombreExperiencia = '';
+                                    $descripcionProblematica = '';
+                                    $experiencias = $experiencias ?? [];
+                                    $listaProblematicas = $listaProblematicas ?? [];
                                     foreach ($experiencias as $exp) {
                                         if ($exp['idExperienciaEducativa'] == $problematica['experienciaEducativa']) {
                                             $nombreExperiencia = $exp['nombre'];
                                             break;
                                         }
                                     }
+
+                                    foreach ($listaProblematicas as $prblm) {
+                                        if ($prblm['idProblematica'] == $problematica['problematica']) {
+                                            $descripcionProblematica = $prblm['descripcion'];
+                                            break;
+                                        }
+                                    }
                                     echo '<td>' . htmlspecialchars($nombreExperiencia, ENT_QUOTES, 'UTF-8') . '</td>';
                                     echo '<td>' . htmlspecialchars($profesores[$problematica['profesor']]['tutorNombre'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-                                    echo '<td>' . htmlspecialchars($listaProblematicas[$problematica['problematica']]['descripcion'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+                                    echo '<td>' . htmlspecialchars($descripcionProblematica, ENT_QUOTES, 'UTF-8') . '</td>';
                                     echo '<td>' . htmlspecialchars($problematica['numAlumnos'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
                                 }
                                 ?>

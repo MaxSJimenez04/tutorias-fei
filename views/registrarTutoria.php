@@ -65,10 +65,10 @@ $menu = BASE_URL . '/menu.php';
 
             <div class="form-group">
                 <label for="periodo">Periodo Escolar:</label>
-                <input type="text" class="form-control" value="<?php echo htmlspecialchars($periodos[0]['periodo']); ?>"
+                <input type="text" class="form-control" value="<?php echo htmlspecialchars($periodoActual['periodo'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                     readonly>
                 <input type="hidden" style="display: none;" id="periodoE" name="periodo" readonly
-                    value="<?php echo htmlspecialchars($periodos[0]['idPeriodo']); ?>">
+                    value="<?php echo htmlspecialchars($periodoActual['idPeriodo'] ?? 0); ?>">
             </div>
 
             <div class="form-group">
@@ -82,11 +82,12 @@ $menu = BASE_URL . '/menu.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-
+            <input type="hidden" id="idTutorHidden" value="<?php echo htmlspecialchars($idTutor ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             <div class="form-group">
                 <label for="periodoTutoria">Periodo de Tutoría: <span class="text-danger">*</span></label>
                 <select class="form-control" name="periodoTutoria" id="periodoTutoria" required>
                     <option value="" disabled selected>-----Selecciona un periodo de tutorías-----</option>
+                    
                 </select>
             </div>
 

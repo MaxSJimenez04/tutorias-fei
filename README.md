@@ -6,20 +6,12 @@ El proyecto **TutoriasFEI** tiene como objetivo registrar las sesiones de tutor�
 ## Tecnología Utilizada  
 - **PHP puro**
 
-## Estado del Proyecto y Seguimiento de Tareas
-
-El seguimiento de los pendientes, sugerencias y tareas realizadas se gestiona a través del siguiente tablero de Trello:  
-🔗 [Tablero de Trello - TutoriasFEI](https://trello.com/b/mgNVv1nG/sistemas-fei)
-
-En este tablero podrás consultar el estado actual del proyecto, las mejoras pendientes, así como las funcionalidades ya implementadas.
 
 ## Base de Datos  
 La base de datos del proyecto se encuentra en el archivo **db.sql**.
 
 El diagrama de la base de datos muestra la estructura lógica de las tablas que conforman el sistema, así como sus relaciones. Este permite comprender mejor cómo fluye la información entre las entidades principales, como los estudiantes tutorados, los tutores, las sesiones de tutoría, las problemáticas reportadas, entre otras. Esta visualización facilita tareas como el mantenimiento, la ampliación de funcionalidades o la depuración de errores.
 
-Puedes consultar el diagrama actualizado en el siguiente enlace:  
-🔗 [Diagrama de la base de datos - TutoriasFEI](https://dbdocs.io/kikgamboa/tutorias-fei)
 
 ## Diagramas  
 Los diagramas proporcionados se encuentran en la carpeta **diagrams**.

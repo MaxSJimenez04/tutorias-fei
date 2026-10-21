@@ -32,10 +32,49 @@ class PeriodoTutoriasController
         }
 
         $idCarrera = isset($_GET['idCarrera']) ? intval($_GET['idCarrera']) : 0;
-
+        $idTutor = isset($_GET['idTutor']) ? intval($_GET['idTutor']): 0;
         try {
-            $periodoTutorias = $this->periodoTutoriasModel->getPeriodosTutoriasByCarrera($idCarrera);
-            
+            $periodoTutorias = $this->periodoTutoriasModel->getPeriodosTutoriasByCarrera($idCarrera, $idTutor);
+            foreach ($periodoTutorias as &$tutoria) {
+                $fechaInicio = $tutoria['fechaInicio'];
+                $fechaFin = $tutoria['fechaFin'];
+        
+                $tutoria['fechaInicioFormateada'] = date('d/m/Y', strtotime($fechaInicio));
+                $tutoria['fechaFinFormateada'] = date('d/m/Y', strtotime($fechaFin));
+                $tutoria['mismaFecha'] = ($fechaInicio === $fechaFin);
+            }
+
+            echo json_encode($periodoTutorias ?? []);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => true,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getSesionesDisponiblesPorTutor()
+    {
+        header('Content-Type: application/json');
+        session_start();
+
+        // FIX: Permitir acceso a Tutores (1) y Coordinadores (4) DEF-01
+        $rolesPermitidos = [1, 4];
+        if (!isset($_SESSION['user']) || !in_array($_SESSION["rol"], $rolesPermitidos)) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acceso denegado']);
+            exit();
+        }
+
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        $idCarrera = isset($_GET['idCarrera']) ? intval($_GET['idCarrera']) : 0;
+        $idTutor = isset($_GET['idTutor']) ? intval($_GET['idTutor']): 0;
+        try {
+            $periodoTutorias = $this->periodoTutoriasModel->getPeriodosTutoriasDisponibles($idCarrera, $idTutor);
             foreach ($periodoTutorias as &$tutoria) {
                 $fechaInicio = $tutoria['fechaInicio'];
                 $fechaFin = $tutoria['fechaFin'];

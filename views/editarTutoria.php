@@ -66,15 +66,15 @@ $menu = BASE_URL . '/menu.php';
 
             <div class="form-group">
                 <label for="periodo">Periodo Escolar:</label>
-                <input type="text" class="form-control" value="<?php echo htmlspecialchars($periodos[0]['periodo']); ?>"
+                <input type="text" class="form-control" value="<?php echo htmlspecialchars($periodoActual['periodo'] ?? ''); ?>"
                     readonly>
                 <input type="hidden" style="display: none;" id="periodoE" name="periodo" readonly
-                    value="<?php echo htmlspecialchars($periodos[0]['idPeriodo']); ?>">
+                    value="<?php echo htmlspecialchars($periodoActual['idPeriodo'] ?? ''); ?>">
             </div>
 
             <div class="form-group">
                 <label for="carrera">Carrera: <span class="text-danger">*</span></label>
-                <select class="form-control" id="carrera" name="carrera" required>
+                <select class="form-control" id="carrera" name="carrera" required disabled>
                     <option value="" disabled>-----Selecciona una carrera-----</option>
                     <?php foreach ($carreras as $carrera): ?>
                         <?php $selected = ($periodoTutoriasActual['carrera'] == $carrera['idCarrera']) ? 'selected' : ''; ?>
@@ -87,8 +87,36 @@ $menu = BASE_URL . '/menu.php';
 
             <div class="form-group">
                 <label for="periodoTutoria">Periodo de Tutoría: <span class="text-danger">*</span></label>
-                <select class="form-control" name="periodoTutoria" id="periodoTutoria" required>
-                    <option value="" disabled selected>-----Selecciona un periodo de tutorías-----</option>
+                <script>
+                        const idPeriodoTutoria = <?= json_encode($idPeriodoSel ?? null); ?>;
+                </script>
+
+                <select class="form-control" name="periodoTutoria" id="periodoTutoria" required disabled>
+                    <?php $idPeriodoSel = $periodoTutoriasActual['idPeriodoTutorias'] ?? $periodoTutoria ?? null; ?>
+                   
+                    <option value="" disabled <?= empty($idPeriodoSel) ? 'selected' : ''; ?>>
+                        -----Selecciona un periodo de tutorías-----
+                    </option>
+                        <?php foreach ($sesiones as $sesion): ?>
+                            <?php 
+                                $idSesionActual = (string)($sesion['idPeriodoTutorias'] ?? '');
+                                $selected = ($idPeriodoSel !== null && (string)$idPeriodoSel === $idSesionActual) ? 'selected' : '';
+                                $inicio = $sesion['fechaInicio'];
+                                $fin = $sesion['fechaFin'];
+
+                                $UnicaFecha = !$fin || ($inicio === $fin);
+
+                                if ($UnicaFecha) {
+                                    $texto = "Sesión #{$sesion['numSesion']} — {$sesion['fechaInicio']}";
+                                }else{
+                                    $texto = "Sesión #{$sesion['numSesion']} — {$sesion['fechaInicio']} a {$sesion['fechaFin']}";
+                                }
+                                
+                                ?>
+                            <option value="<?= $sesion['idPeriodoTutorias']; ?>"<?= $selected; ?>>
+                                <?= htmlspecialchars($texto, ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach ?>
                 </select>
             </div>
 

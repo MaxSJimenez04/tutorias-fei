@@ -55,7 +55,7 @@ require_once '../config/config.php';
 
             <div class="form-group">
                 <label for="periodo">Periodo Escolar Actual:</label>
-                <input type="text" class="form-control" id="periodo" value="<?= htmlspecialchars($periodoActual[0]['periodo'], ENT_QUOTES, 'UTF-8') ?>" readonly>
+                <input type="text" class="form-control" id="periodo" value="<?= htmlspecialchars($periodoActual['periodo'], ENT_QUOTES, 'UTF-8') ?>" readonly>
             </div>
 
             <div class="form-group">

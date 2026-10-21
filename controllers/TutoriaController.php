@@ -1,4 +1,7 @@
 <?php
+
+use SebastianBergmann\Environment\Console;
+
 require_once '../config/config.php';
 require_once '../config/connection.php';
 require_once '../models/Tutoria.php';
@@ -97,8 +100,7 @@ class TutoriaController
         $idTutor = $row['idTutor'];
 
         $carreras = $this->tutoriaModel->getCarrerasByTutor($idTutor);
-        $periodos = $this->periodoModel->getCurrentPeriodo();
-
+        $periodoActual = $this->periodoModel->getCurrentPeriodo();  
         require '../views/registrarTutoria.php';
     }
 
@@ -220,11 +222,10 @@ class TutoriaController
             header('Location: ' . BASE_URL . '/tutorias.php');
             exit();
         }
-
         $carreras = $this->tutoriaModel->getCarrerasByTutor($idTutor);
-        $periodos = $this->periodoModel->getCurrentPeriodo();
+        $periodoActual = $this->periodoModel->getCurrentPeriodo();
         $periodoTutoriasActual = $this->periodoTutoriasModel->getPeriodoTutoriasById($tutoria['periodoTutorias']);
-
+        $sesiones = $this->periodoTutoriasModel->getPeriodosTutoriasByCarrera($tutoria['carrera']);
         // Preparar variables para la vista
         $lugar = htmlspecialchars($tutoria['lugar'] ?? '', ENT_QUOTES, 'UTF-8');
         $fecha = htmlspecialchars($tutoria['fechaInicio'] ?? '', ENT_QUOTES, 'UTF-8');

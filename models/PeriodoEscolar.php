@@ -20,10 +20,10 @@ class PeriodoEscolar
 
     public function getCurrentPeriodo()
     {
-        $stmt = $this->conn->prepare("SELECT idPeriodo, nombre AS periodo FROM periodo WHERE actual = 1");
+        $stmt = $this->conn->prepare("SELECT idPeriodo, nombre AS periodo FROM periodo WHERE actual = 1 LIMIT 1");
         $stmt->execute();
         $result = $stmt->get_result();
-        $periodo = $result->fetch_all(MYSQLI_ASSOC);
+        $periodo = $result->fetch_assoc();
         $stmt->close();
         return $periodo;
     }

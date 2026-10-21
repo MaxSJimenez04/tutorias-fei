@@ -34,14 +34,18 @@ $(document).ready(function () {
 
     $("#carrera").on("change", function () {
         const idCarrera = $(this).val();
+        const idTutor = $("#idTutorHidden").val();
 
-        if (!idCarrera) return;
+        if (!idCarrera || !idTutor) {
+            return;
+        }
 
         $.ajax({
-            url: "getPeriodoTutorias.php",
+            url: "getSesionesDisponibles.php",
             method: "GET",
             data: {
                 idCarrera: idCarrera,
+                idTutor: idTutor,
             },
             dataType: "json",
             success: function (tutorias) {
@@ -136,11 +140,30 @@ $(document).ready(function () {
             $("#div_fecha_fin").hide();
         }
     });
+
+    $("#archivo_horario").on("change", function () {
+        const archivo = this.files[0];
+        console.log(archivo);
+        
+        if (archivo) {
+            const extensionesPermitidas = ['pdf','doc','docx','xls','xlsx'];
+            const extension = archivo.name.split('.').pop().toLowerCase();
+            if (!extensionesPermitidas.includes(extension)) {
+                Swal.fire({
+                    title: "Archivo no válido",
+                    text: "Extensiones de archivo permitidas: .pdf, .doc, .docx, .xls, .xlsx",
+                    icon: "error",
+                    showConfirmButton: true,
+                });
+                $(this).val('');
+            }
+        }
+    })
 });
 
 function validarFormulario() {
     const carreraSeleccionada = $("#carrera").val();
-    const periodoTutoriaSeleccionada = $("#periodoTutoria").val();
+    const periodoTutoriaSeleccionada = $("#periodoE").val();
     const modalidadSeleccionada = $('input[name="modalidad"]:checked').val();
     const periodoAtencionVisible = $('[name="periodoAtencion"]')
         .closest(".form-group")
@@ -154,7 +177,6 @@ function validarFormulario() {
     const fechaFinSeleccionada = fechaFinVisible ? $("#fecha_fin").val() : null;
     const notas = $("#notas").val();
     const lugar = $("#lugar").val();
-    const archivo = $("#archivo_horario").val();
 
     $(".form-control").removeClass(
         "border border-danger border-2 border-success"

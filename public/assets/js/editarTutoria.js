@@ -34,43 +34,6 @@ $(document).ready(function () {
     var idCarrera = $('#carrera').val();
     var idPeriodoTutoria = $('#periodoTutoria').data('selected');
 
-    if (idCarrera) {
-        $.ajax({
-            url: "getPeriodoTutorias.php",
-            method: "GET",
-            data: { idCarrera: idCarrera },
-            dataType: "json",
-            success: function (tutorias) {
-                const select = $("#periodoTutoria");
-                select.empty();
-                if (tutorias.length > 0) {
-                    select.append("<option disabled>-----Selecciona un periodo de tutorías-----</option>");
-                    tutorias.forEach((tutoria) => {
-                        const texto = tutoria.mismaFecha
-                            ? `Sesión #${tutoria.numSesion} — ${tutoria.fechaInicioFormateada}`
-                            : `Sesión #${tutoria.numSesion} — ${tutoria.fechaInicioFormateada} a ${tutoria.fechaFinFormateada}`;
-                        const selected = tutoria.idPeriodoTutorias == idPeriodoTutoria ? 'selected' : '';
-                        select.append(`
-                            <option 
-                                value="${tutoria.idPeriodoTutorias}" 
-                                data-fechainicio="${tutoria.fechaInicio}" 
-                                data-fechafin="${tutoria.fechaFin}" 
-                                data-mismafecha="${tutoria.mismaFecha}" ${selected}>
-                                ${texto}
-                            </option>
-                        `);
-                    });
-                } else {
-                    select.append("<option disabled selected>No hay periodos de tutorías disponibles</option>");
-                }
-                select.trigger('change'); // Disparar el evento para actualizar la UI
-            },
-            error: function () {
-                alert('No se pudieron cargar los periodos de tutoría.');
-            }
-        });
-    }
-
     $("#carrera").on("change", function () {
         const idCarrera = $(this).val();
 
@@ -84,27 +47,42 @@ $(document).ready(function () {
             },
             dataType: "json",
             success: function (tutorias) {
+                console.log("Sesiones: ", tutorias);
                 const select = $("#periodoTutoria");
                 select.empty();
-                if (tutorias.length > 0) {
-                    select.append(
-                        "<option disabled selected>-----Selecciona un periodo de tutorías-----</option>"
-                    );
-                    tutorias.forEach((tutoria) => {
-                        const fechaInicioStr = tutoria.fechaInicioFormateada;
-                        const fechaFinStr = tutoria.fechaFinFormateada;
-                        const mismaFecha = tutoria.mismaFecha;
 
-                        const texto = mismaFecha
-                            ? `Sesión #${tutoria.numSesion} — ${fechaInicioStr}`
-                            : `Sesión #${tutoria.numSesion} — ${fechaInicioStr} a ${fechaFinStr}`;
+                if (tutorias.length > 0) {
+                    const hasPreselection = typeof idPeriodoTutoria !== 'undefined' && idPeriodoTutoria;
+                    const defaultSelected = hasPreselection ? '' : 'selected';
+
+                    select.append(`<option disabled ${defaultSelected}>-----Selecciona un periodo de tutorías-----</option>`);
+                    
+                    tutorias.forEach((tutoria) => {
+                        const fechaInicioStr = tutoria.fechaInicioFormateada || tutoria.fechaInicio || '';
+                        const fechaFinStr = tutoria.fechaFinFormateada || tutoria.fechaFin || '';
+                        const mismaFecha = tutoria.mismaFecha || (fechaInicioStr === fechaFinStr) || !fechaFinStr;
+
+                        let texto = `Sesión #${tutoria.numSesion}`;
+    
+                        if (mismaFecha) {
+                            if (fechaInicioStr) texto += ` — ${fechaInicioStr}`;
+                        } else {
+                            if (fechaInicioStr && fechaFinStr) {
+                                texto += ` — ${fechaInicioStr} a ${fechaFinStr}`;
+                            } else if (fechaInicioStr) {
+                                texto += ` — ${fechaInicioStr}`;
+                            }
+                        }
+
+                        const isSelected = (typeof idPeriodoTutoria !== 'undefined' && idPeriodoTutoria && tutoria.idPeriodoTutorias == idPeriodoTutoria) ? 'selected' : '';
 
                         select.append(`
                             <option 
                                 value="${tutoria.idPeriodoTutorias}" 
-                                data-fechainicio="${tutoria.fechaInicio}" 
-                                data-fechafin="${tutoria.fechaFin}" 
-                                data-mismafecha="${mismaFecha}">
+                                data-fechainicio="${tutoria.fechaInicio || ''}" 
+                                data-fechafin="${tutoria.fechaFin || ''}" 
+                                data-mismafecha="${mismaFecha}"
+                                ${isSelected}>
                                 ${texto}
                             </option>
                         `);
@@ -114,6 +92,7 @@ $(document).ready(function () {
                         "<option disabled selected>No hay periodos de tutorías disponibles</option>"
                     );
                 }
+                select.trigger('change');
             },
 
             error: function () {
@@ -127,39 +106,46 @@ $(document).ready(function () {
     });
 
     $("#periodoTutoria").on("change", function () {
+        const selectedVal = $(this).val();
+
+        if (selectedVal) {
+            $("#hiddenPeriodoTutoria").val().selectedVal();
+        }
         const option = $(this).find(":selected");
         const mismaFecha = option.data("mismafecha");
         const fechaInicio = option.data("fechainicio");
-
-        if (mismaFecha) {
-            // Si es de un solo día, ocultar periodo de atención, fecha y fecha fin
-            $("#div_fecha").hide();
-            $("#div_fecha_fin").hide();
-            $('input[name="periodoAtencion"]').prop("checked", false);
-            $("#div_fecha").find("label").text("Fecha:");
-            $("[name='periodoAtencion']").closest(".form-group").hide();
-            $("#fecha").val(fechaInicio);
-        } else {
-            // Si es de más de un día, mostrar periodo de atención y manejar visibilidad de fechas según selección
-            $("[name='periodoAtencion']").closest(".form-group").show();
-            // Si ya hay una selección previa de periodoAtencion, disparar el evento para actualizar la UI
-            const periodoAtencionSeleccionado = $(
-                'input[name="periodoAtencion"]:checked'
-            ).val();
-            if (periodoAtencionSeleccionado === "Más de un día") {
-                $("#div_fecha").show();
-                $("#div_fecha").find("label").text("Fecha inicio:");
-                $("#div_fecha_fin").show();
-            } else if (periodoAtencionSeleccionado === "Un solo día") {
-                $("#div_fecha").show();
-                $("#div_fecha").find("label").text("Fecha:");
-                $("#div_fecha_fin").hide();
-            } else {
-                // Si no hay selección, ocultar ambos
+        if (mismaFecha !== undefined) {
+            if (mismaFecha) {
+                // Si es de un solo día, ocultar periodo de atención, fecha y fecha fin
                 $("#div_fecha").hide();
                 $("#div_fecha_fin").hide();
+                $('input[name="periodoAtencion"]').prop("checked", false);
+                $("#div_fecha").find("label").text("Fecha:");
+                $("[name='periodoAtencion']").closest(".form-group").hide();
+                $("#fecha").val(fechaInicio);
+            } else {
+                // Si es de más de un día, mostrar periodo de atención y manejar visibilidad de fechas según selección
+                $("[name='periodoAtencion']").closest(".form-group").show();
+                // Si ya hay una selección previa de periodoAtencion, disparar el evento para actualizar la UI
+                const periodoAtencionSeleccionado = $(
+                    'input[name="periodoAtencion"]:checked'
+                ).val();
+                if (periodoAtencionSeleccionado === "Más de un día") {
+                    $("#div_fecha").show();
+                    $("#div_fecha").find("label").text("Fecha inicio:");
+                    $("#div_fecha_fin").show();
+                } else if (periodoAtencionSeleccionado === "Un solo día") {
+                    $("#div_fecha").show();
+                    $("#div_fecha").find("label").text("Fecha:");
+                    $("#div_fecha_fin").hide();
+                } else {
+                    // Si no hay selección, ocultar ambos
+                    $("#div_fecha").hide();
+                    $("#div_fecha_fin").hide();
+                }
             }
         }
+        
     });
 
     // Manejar cambios en periodo de atención
@@ -307,5 +293,6 @@ function validarFormulario() {
         $("#fecha_fin").val($("#fecha").val());
     }
 
-    $("#form").off("submit").submit();
+    $("#carrera, #periodoTutoria").prop("disabled", false);
+    $("#form").submit();
 }
