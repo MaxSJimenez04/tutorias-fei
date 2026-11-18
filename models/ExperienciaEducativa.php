@@ -115,6 +115,7 @@ class ExperienciaEducativa
             ee.nombre
         FROM experiencia_educativa ee 
         WHERE ee.programaEducativo = ?
+        ORDER BY ee.nombre
     ");
         $stmt->bind_param("i", $idCarrera);
         $stmt->execute();

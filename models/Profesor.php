@@ -273,6 +273,7 @@ class Profesor
         INNER JOIN seccion s ON s.idProfesor = t.idTutor
         INNER JOIN experiencia_educativa ee ON ee.idExperienciaEducativa = s.idExperienciaEducativa
         WHERE ee.programaEducativo = ?
+        ORDER BY tutorNombre 
     ");
         $stmt->bind_param("i", $idCarrera);
         $stmt->execute();
