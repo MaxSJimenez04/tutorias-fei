@@ -82,6 +82,10 @@ $tutor = htmlspecialchars($reporte['nombreTutor'] ?? '', ENT_QUOTES, 'UTF-8');
                                     }
 
                                     foreach ($listaProblematicas as $prblm) {
+                                        if ($problematica['problematica'] === null && $problematica['otro'] != null) {
+                                                $descripcionProblematica = $problematica['otro'];
+                                                break;
+                                            }
                                         if ($prblm['idProblematica'] == $problematica['problematica']) {
                                             $descripcionProblematica = $prblm['descripcion'];
                                             break;
