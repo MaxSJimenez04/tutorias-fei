@@ -8,3 +8,8 @@
 #temp files
 *.log
 *.cache
+
+#Archivos
+/public/uploads/*
+!/public/uploads/importe_ejemplo/
+!/public/uploads/importe_ejemplo/**
