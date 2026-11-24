@@ -43,6 +43,7 @@ class EstudianteController
         $csrf_token = $_SESSION['csrf_token'];
 
         $estudiantes = $this->estudianteModel->getEstudiantes();
+        $programas = $this->carreraModel->getCarreras();
 
         require_once '../views/administrarEstudiantes.php';
     }
@@ -371,6 +372,120 @@ class EstudianteController
                 echo json_encode(['status' => 'error', 'message' => 'ID de estudiante inválido.']);
             }
         } else {
+            header('Location: ' . BASE_URL . '/administrarEstudiantes.php');
+            exit();
+        }
+    }
+
+    public function importarEstudiantesCSV()
+    {
+        session_start();
+        $rolesPermitidos = [3];
+        if (!isset($_SESSION['user']) || !in_array($_SESSION["rol"], $rolesPermitidos)) {
+            header('Location: ' . BASE_URL . '/cerrarSesion.php');
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+                $_SESSION['errors'] = ["Error: Solicitud no válida."];
+                header('Location: ' . BASE_URL . '/administrarEstudiantes.php');
+                exit();
+            }
+
+            $idCarrera = isset($_POST['idCarrera']) ? intval($_POST['idCarrera']) : 0;
+
+            if ($idCarrera === 0) {
+                $_SESSION['errors'] = ["Por favor, selecciona una Carrera"];
+                header('Location: ' . BASE_URL . '/administrarEstudiantes.php');
+                exit();
+            }
+
+            if (isset($_FILES['csv_estudiantes']) && $_FILES['csv_estudiantes']['error'] == 0) {
+                $archivoTmp = $_FILES['csv_estudiantes']['tmp_name'];
+                
+                if (($handle = fopen($archivoTmp, "r")) !== FALSE) {
+                    // Saltar la línea de encabezados
+                    fgetcsv($handle, 1000, ",");
+                    
+                    $registrados = 0;
+                    $omitidos = 0;
+
+                    // Leer línea por línea
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        $nombre = isset($data[0]) ? trim($data[0]) : ''; // Nombre
+                        $apellidoP = isset($data[1]) ? trim($data[1]) : '';  // Apellido paterno
+                        $apellidoM = isset($data[2]) ? trim($data[2]) : ''; //Apellido materno
+                        $matricula = isset($data[3]) ? trim($data[3]) : ''; //Matricula
+                        $correo = isset($data[4]) ? trim($data[4]) : ''; //Correo Institucional
+                        $correoTutor =isset($data[5]) ? trim($data[5]) : ''; //Correo de tutor para enlazar 
+                        
+                        if (!empty($correo) && !empty($correoTutor)) {
+                            //Recuperar id de tutor con su correo
+                            $stmtTutor = $this->conn->prepare("SELECT idTutor FROM tutor WHERE correoInstitucional = ? LIMIT 1");
+                            $stmtTutor->bind_param("s", $correoTutor);
+                            $stmtTutor->execute();
+                            $resTutor = $stmtTutor->get_result()->fetch_assoc();
+                            $tutor = $resTutor['idTutor'] ?? null;
+                            $stmtTutor-> close();
+                        
+                            // Validar formato de correo UV
+                            if (!preg_match("/^z{$matricula}@estudiantes\.uv\.mx$/i", $correo)) {
+                                $omitidos++;
+                                continue;
+                            }
+
+                            // Comprobar si el correo ya existe en la tabla sesion para evitar duplicados
+                            $check = $this->conn->prepare("SELECT idSesion FROM sesion WHERE correoInstitucional = ? LIMIT 1");
+                            $check->bind_param("s", $correo);
+                            $check->execute();
+                            $check->store_result();
+
+                            if ($check->num_rows > 0) {
+                                // Ya existe, omitimos
+                                $omitidos++;
+                                $check->close();
+                            } else {
+                                $check->close();
+                                
+                                // 1. Insertamos primero en la tabla sesion (rol 2 = Tutorado)
+                                $stmtSesion = $this->conn->prepare("INSERT INTO sesion (correoInstitucional, rol) VALUES (?, 2)");
+                                $stmtSesion->bind_param("s", $correo);
+                                
+                                if ($stmtSesion->execute()) {
+                                    $idSesion = $this->conn->insert_id;
+                                    $stmtSesion->close();
+                                    
+                                    // 2. Insertamos en la tabla tutor vinculando el idSesion
+                                    $stmtEstudiante = $this->conn->prepare("INSERT INTO 
+                                    tutorado (nombre, apellidoPaterno, apellidoMaterno, matricula, correoInstitucional, carrera, sesion, tutor, correoTutor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                    $stmtEstudiante->bind_param("sssssiiis",$nombre,$apellidoP,$apellidoM,$matricula,$correo,$idCarrera,$idSesion,$tutor,$correoTutor);
+
+                                    if ($stmtEstudiante->execute()) {
+                                        $registrados++;
+                                    } else {
+                                        $omitidos++;
+                                    }
+                                    $stmtEstudiante->close();
+                                } else {
+                                    $omitidos++;
+                                    $stmtSesion->close();
+                                }
+                            }
+                        }
+                    }
+                    fclose($handle);
+
+                    $_SESSION['message'] = "Importación finalizada. Registrados exitosamente: $registrados. Omitidos/Duplicados: $omitidos.";
+                    header('Location: ' . BASE_URL . '/administrarEstudiantes.php');
+                    exit();
+                } else {
+                    $_SESSION['errors'] = ["No se pudo leer el archivo CSV."];
+                }
+            } else {
+                $_SESSION['errors'] = ["Por favor, selecciona un archivo CSV válido."];
+            }
+            
             header('Location: ' . BASE_URL . '/administrarEstudiantes.php');
             exit();
         }

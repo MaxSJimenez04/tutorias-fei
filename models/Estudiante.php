@@ -1,4 +1,7 @@
 <?php
+
+use PhpParser\Node\Stmt;
+
 class Estudiante
 {
     private $conn;
@@ -66,19 +69,36 @@ class Estudiante
             }
             
             $idSesion = $this->conn->insert_id;
+            $correoTutor = null;
+            $tutor = null;
+            if (!empty($data['tutor']) && is_numeric($data['tutor'])) {
+                $tutor =  (int) $data['tutor'];
+                $stmtTutor = $this->conn->prepare("SELECT correoInstitucional FROM tutor WHERE idTutor = ? LIMIT 1");
+                $stmtTutor->bind_param("i", $tutor);
+                $stmtTutor->execute();
+                $resTutor = $stmtTutor->get_result()->fetch_assoc();
+                $correoTutor= $resTutor['correoInstitucional'] ?? null;
+                $stmtTutor->close();
+            }elseif (!empty($data['correoTutor'])) {
+                $correoTutor= trim($data['correoTutor']);
+                $stmtTutor = $this->conn->prepare("SELECT idTutor FROM tutor WHERE correoInstitucional = ? LIMIT 1");
+                $stmtTutor->bind_param("s", $correoTutor);
+                $stmtTutor->execute();
+                $resTutor = $stmtTutor->get_result()->fetch_assoc();
+                $tutor = $resTutor['idTutor'] ?? null;
+                $stmtTutor-> close();
+            }
             $stmtSesion->close();
 
             $stmtEstudiante = $this->conn->prepare("
-                INSERT INTO tutorado (nombre, apellidoPaterno, apellidoMaterno, matricula, carrera, correoInstitucional, sesion, tutor)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO tutorado (nombre, apellidoPaterno, apellidoMaterno, matricula, carrera, correoInstitucional, sesion, tutor, correoTutor)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $carrera = isset($data['carrera']) ? (int) $data['carrera'] : null;
-            $tutor = isset($data['tutor']) ? (int) $data['tutor'] : null;
-            $types = "ssssisii"; 
+            $types = "ssssisiis"; 
             
-            $stmtEstudiante->bind_param($types, $data['nombre'], $data['apellidoPaterno'], $data['apellidoMaterno'], $data['matricula'], $carrera, $data['correoInstitucional'], $idSesion, $tutor);
-
+            $stmtEstudiante->bind_param($types, $data['nombre'], $data['apellidoPaterno'], $data['apellidoMaterno'], $data['matricula'], $carrera, $data['correoInstitucional'], $idSesion, $tutor, $correoTutor);
             if (!$stmtEstudiante->execute()) {
                 if ($stmtEstudiante->errno == 1062) throw new Exception("1062");
                 throw new Exception("Error al ejecutar la inserción en tutorado");

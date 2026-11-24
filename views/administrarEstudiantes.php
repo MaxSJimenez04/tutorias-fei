@@ -24,7 +24,46 @@ require_once '../config/config.php';
         </div>
     </div>
 
-    <div class="new-button-container">
+    <!-- Contenedor de alertas -->
+    <div class="container mt-3" style="width: 82%; margin: 0 auto;">
+        <?php
+        if (isset($_SESSION['errors'])) {
+            echo '<div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 10px;">';
+            foreach ($_SESSION['errors'] as $error) {
+                echo "<p style='margin: 0;'>$error</p>";
+            }
+            echo '</div>';
+            unset($_SESSION['errors']);
+        }
+
+        if (isset($message)) {
+            echo '<div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px;">';
+            echo "<p style='margin: 0;'>{$message}</p>";
+            echo '</div>';
+        }
+        ?>
+    </div>  
+
+    <div class="new-button-container" style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: flex-end; align-items: center;">
+         <form action="<?= BASE_URL; ?>/importarTutorados.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 5px; margin: 0; background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> NOMBRE, APELLIDO PATERNO, APELLIDO MATERNO, MATRICULA, CORREO INSTITUCIONAL, CORREO DEL TUTOR</small>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
+                
+                <select name="idCarrera" class="form-control" style="width: auto; font-size: 14px; padding: 5px;" required>
+                    <option value="" disabled selected>-- Elige Carrera --</option>
+                    <?php if(!empty($programas)) { foreach ($programas as $prog): ?>
+                        <option value="<?= $prog['idCarrera'] ?>"><?= htmlspecialchars($prog['carrera'] ?? $prog['nombre']) ?></option>
+                    <?php endforeach; } ?>
+                </select>
+
+                <input type="file" name="csv_estudiantes" accept=".csv" required style="font-size: 14px; max-width: 200px;">
+                
+                <button type="submit" class="buttonNew" style="background-color: #17a2b8;" title="Sube CSV">
+                    <i class="fas fa-file-csv"></i> Importar CSV
+                </button>
+            </div>
+        </form>
         <button class="buttonNew" onclick="location.href = '<?= BASE_URL; ?>/registroEstudiante.php' "><i class="fas fa-plus"></i> Nuevo</button>
     </div>
 
