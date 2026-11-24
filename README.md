@@ -50,14 +50,14 @@ El `TAG` debe ser cualquiera de los siguientes, el que más se ajuste a lo que e
 La descripción debe ser concisa, si ocupa más de una línea, es mejor revisar si se deben realizar dos commits.
 
 Ejemplos:
-``fix(SessionReport): shows the table data correctly``
-``feat: add French language``
-``docs: spell correctly PROFESOR header in the report table``
+- ``fix(SessionReport): shows the table data correctly``
+- ``feat: add French language``
+- ``docs: spell correctly PROFESOR header in the report table``
 [NOTA: Tanto el TAG como la descripción no deben empezar con Mayúsculas. No importa si se escribe en 3ra persona (shows, implements) o en imperativo/infinitivo (show, implement, create)]
 El módulo es opcional si, este debe abarca alguna sección del sistema (ej. AdministrarEstudiantes, EditarReporte)
 ### Nombrado de pull requests (PR)
 Para realizar un Pull Request, se debe nombrar de la siguiente manera:
-```[TAG]: Resumen de lo que resuelve PR```
+- ```[TAG]: Resumen de lo que resuelve PR```
 El [TAG] de los Pull Request es similar a los del commit, pero este se limita a los siguientes:
 
 * `feat`: — Nueva funcionalidad
@@ -67,10 +67,10 @@ El [TAG] de los Pull Request es similar a los del commit, pero este se limita a 
 * `docs`: — Cambios en documentación
 
 El _resumen de lo que resuelve el PR_ es simplemente una descripción breve de qué realizan los commits del PR, por ejemplo:
-`refactor: optimize grades inquiry`, en este PR puede haber varios commits de diferentes módulos.
-`chore: update PHP version`, este puede ser un único commit (el cual puede tener el mismo título que el commit)
+* `refactor: optimize grades inquiry`, en este PR puede haber varios commits de diferentes módulos.
+* `chore: update PHP version`, este puede ser un único commit (el cual puede tener el mismo título que el commit)
 
-El commit sigue las mismas reglas de escritura e idioma que el commmit
+El pull request sigue las mismas reglas de escritura e idioma que el commit
 ### Nombrado de ramas
 La estructura para el nombrado de ramas es la siguiente:
 `[TAG]/descripcion-corta`
