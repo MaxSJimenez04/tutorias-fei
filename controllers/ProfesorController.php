@@ -400,10 +400,13 @@ class ProfesorController
 
                     // Leer línea por línea
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        $maestro = isset($data[1]) ? trim($data[1]) : ''; // Nombre completo
-                        $correo = isset($data[2]) ? trim($data[2]) : '';  // Correo
+                        $noPersonal = isset($data[0]) ? trim($data[0]) : '';//No. personal
+                        $nombre = isset($data[1]) ? trim($data[1]) : ''; // Nombre
+                        $apellidoP = isset($data[2]) ? trim($data[2]) : ''; //Apellido paterno
+                        $apellidoM = isset($data[3]) ? trim($data[3]) : ''; //Apellido materno
+                        $correo = isset($data[4]) ? trim($data[4]) : '';  // Correo
                         
-                        if (!empty($maestro) && !empty($correo)) {
+                        if (!empty($nombre) && !empty($correo)) {
                             // Validar formato de correo UV
                             if (!preg_match('/^.+@(uv\.mx|estudiantes\.uv\.mx)$/', $correo)) {
                                 $omitidos++;
@@ -432,8 +435,8 @@ class ProfesorController
                                     $stmtSesion->close();
                                     
                                     // 2. Insertamos en la tabla tutor vinculando el idSesion
-                                    $stmtTutor = $this->conn->prepare("INSERT INTO tutor (nombre, apellidoPaterno, apellidoMaterno, noPersonal, correoInstitucional, sesion) VALUES (?, '', '', '', ?, ?)");
-                                    $stmtTutor->bind_param("ssi", $maestro, $correo, $idSesion);
+                                    $stmtTutor = $this->conn->prepare("INSERT INTO tutor (nombre, apellidoPaterno, apellidoMaterno, noPersonal, correoInstitucional, sesion) VALUES (?, ?, ?, ?, ?, ?)");
+                                    $stmtTutor->bind_param("sssssi", $nombre, $apellidoP, $apellidoM, $noPersonal, $correo, $idSesion);
                                     
                                     if ($stmtTutor->execute()) {
                                         $registrados++;

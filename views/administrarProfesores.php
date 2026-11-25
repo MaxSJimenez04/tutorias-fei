@@ -48,7 +48,7 @@ require_once '../config/config.php';
     <div class="new-button-container" style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-bottom: 20px;">
         
         <form action="<?= BASE_URL; ?>/importarProfesores.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 5px; margin: 0; background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> NO., Maestro, Correo</small>
+            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> No. personal, Nombre, Apellido paterno, Apellido materno, Correo</small>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                 <input type="file" name="csv_docentes" accept=".csv" required style="font-size: 14px;">
