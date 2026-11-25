@@ -46,7 +46,7 @@ require_once '../config/config.php';
 
     <div class="new-button-container" style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: flex-end; align-items: center;">
          <form action="<?= BASE_URL; ?>/importarTutorados.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 5px; margin: 0; background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> NOMBRE, APELLIDO PATERNO, APELLIDO MATERNO, MATRICULA, CORREO INSTITUCIONAL, CORREO DEL TUTOR</small>
+            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> NOMBRE, APELLIDO PATERNO, APELLIDO MATERNO, MATRICULA, CORREO INSTITUCIONAL, CORREO INSTITUCIONAL DEL TUTOR</small>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                 

@@ -48,7 +48,7 @@ require_once '../config/config.php';
         
         <!-- Formulario de Importación con texto de ayuda -->
         <form action="<?= BASE_URL; ?>/importarExperiencias.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 5px; margin: 0; background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> DOCENTE, EXPERIENCIA EDUCATIVA, NRC</small>
+            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> CORREO INSTITUCIONAL DEL DOCENTE, EXPERIENCIA EDUCATIVA, NRC</small>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                 
