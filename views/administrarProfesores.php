@@ -48,8 +48,8 @@ require_once '../config/config.php';
     <div class="new-button-container" style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-bottom: 20px;">
         
         <form action="<?= BASE_URL; ?>/importarProfesores.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 5px; margin: 0; background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
-            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> No. personal, Nombre, Apellido paterno, Apellido materno, Correo</small>
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <small style="color: #6c757d; font-size: 12px;"><b>Formato requerido CSV:</b> NO. DE PERSONAL, NOMBRE, APELLIDO PATERNO, APELLIDO MATERNO, CORREO INSTITUCIONAL</small>
+            <div style="display: inline flow-root; align-items: center; gap: 10px;">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                 <input type="file" name="csv_docentes" accept=".csv" required style="font-size: 14px;">
                 <button type="submit" class="buttonNew" style="background-color: #17a2b8;" title="Sube un archivo CSV">

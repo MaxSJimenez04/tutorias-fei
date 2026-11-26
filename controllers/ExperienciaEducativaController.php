@@ -89,13 +89,13 @@ class ExperienciaEducativaController
                     $omitidos = 0;
 
                     // Consultas preparadas
-                    $stmtFindTutor = $this->conn->prepare("SELECT idTutor FROM tutor WHERE TRIM(CONCAT(nombre, ' ', COALESCE(apellidoPaterno, ''), ' ', COALESCE(apellidoMaterno, ''))) = ? LIMIT 1");
+                    $stmtFindTutor = $this->conn->prepare("SELECT idTutor FROM tutor WHERE correoInstitucional = ? LIMIT 1");
                     $stmtFindEE = $this->conn->prepare("SELECT idExperienciaEducativa FROM experiencia_educativa WHERE nombre = ? AND programaEducativo = ? LIMIT 1");
                     $stmtInsertEE = $this->conn->prepare("INSERT INTO experiencia_educativa (nombre, programaEducativo) VALUES (?, ?)");
-                    $stmtInsertSeccion = $this->conn->prepare("INSERT INTO seccion (idProfesor, idExperienciaEducativa, idPeriodo, nrc) VALUES (?, ?, ?, ?)");
+                    $stmtInsertSeccion = $this->conn->prepare("INSERT INTO seccion (idProfesor, correoProfesor,idExperienciaEducativa, idPeriodo, nrc) VALUES (?, ?, ?, ?, ?)");
 
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        $docente = isset($data[0]) ? trim(preg_replace('/\s+/', ' ', $data[0])) : '';
+                        $docente = isset($data[0]) ? trim($data[0]) : '';
                         $materia = isset($data[1]) ? trim($data[1]) : '';
                         $nrc = isset($data[2]) ? trim($data[2]) : '';
                         
@@ -134,7 +134,7 @@ class ExperienciaEducativaController
 
                             // 3. Crear el Grupo
                             try {
-                                $stmtInsertSeccion->bind_param("iiis", $idTutor, $idEE, $idPeriodo, $nrc);
+                                $stmtInsertSeccion->bind_param("isiis", $idTutor, $docente,$idEE, $idPeriodo, $nrc);
                                 if ($stmtInsertSeccion->execute()) {
                                     $registrados++;
                                 } else {
